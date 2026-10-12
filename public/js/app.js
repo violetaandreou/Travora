@@ -503,7 +503,7 @@ const TravelApp = {
     // Live-price verification is deliberately an external search, not an unsupported API claim.
     const verificationHtml = `
       <section class="price-verification" style="margin:18px 0;padding:18px;border:1px solid #b8ddd4;border-radius:14px;background:#f2faf8;">
-        <h3 style="margin:0 0 8px;">Check real travel prices / Έλεγχος πραγματικών τιμών</h3>
+        <h3 style="margin:0 0 8px;">Check real travel prices</h3>
         <p style="margin:0 0 12px;">AI estimates are not live offers. Compare round-trip flights and accommodation for your dates. The final cost may be lower or higher.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
           <a href="https://www.google.com/travel/flights" target="_blank" rel="noopener noreferrer" style="padding:9px 14px;border:1px solid #0d887b;border-radius:9px;">Google Flights ↗</a>
