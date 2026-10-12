@@ -146,8 +146,12 @@ The user is planning a trip with the following preferences:
 - Total Target Budget: ${budgetSEK || 15000} SEK
 - Travel Interests: ${interests || 'Culture, Food, City Exploration'}
 
-Please recommend 3 to 4 destinations that match their interests and approximate budget range.
-All ballpark costs MUST be estimates in Swedish Kronor (SEK).
+Please recommend 3 to 4 DISTINCT destinations that are practical from the departure city and match the user's interests and budget.
+- Prioritize places that can realistically fit the TOTAL group budget. Consider travel distance and transport costs from the departure city. Do not suggest unrelated far-away destinations merely to fill the list.
+- Each estimatedBallparkCostSEK must be an approximate TOTAL in Swedish Kronor (SEK) for ALL travelers for the ENTIRE trip (not per person or per day).
+- Use the SAME cost assumptions for every destination: round-trip transport from the departure city, shared/economy accommodation for (days - 1) nights, meals for all days, activities, and local transport. Do not leave out flights or hotels to make a place seem cheaper.
+- Make sensible, consistent rough estimates. Do not treat the user's budget as the cost estimate or simply repeat it; costs may exceed the budget when warranted. Prefer less expensive destinations when the budget is tight.
+- Mention the main reason a destination fits the budget in whyRecommended. These amounts are illustrative planning estimates, NOT checked ticket prices or live booking offers.
 
 Return your response strictly as valid JSON adhering to this structure:
 {
@@ -164,7 +168,7 @@ Return your response strictly as valid JSON adhering to this structure:
   ]
 }`;
 
-  return generateAndParseJson(ai, model, prompt, 'You are an expert travel advisor. Provide realistic ballpark travel estimates in Swedish Kronor (SEK). Always output valid JSON.');
+  return generateAndParseJson(ai, model, prompt, 'You are an expert travel advisor. Use one consistent total-trip cost method for every destination, including round-trip travel, accommodation, food, activities, and local transport for every traveler and day. All costs are estimates in SEK, not live quotes. Always output valid JSON.');
 }
 
 /**
