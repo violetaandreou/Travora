@@ -1,0 +1,21 @@
+{
+  "name": "ai-smart-travel-companion",
+  "version": "1.0.0",
+  "description": "AI Smart Travel Companion - School Project",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/genai": "^2.28.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1"
+  }
+}

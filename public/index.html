@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travora | Your AI-Powered Travel Planner</title>
+  
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       1. Header & Navigation
+       ====================================================================== -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <span class="brand-icon">✈️</span>
+        <span data-i18n="brand.name">Travora</span>
+      </a>
+      
+      <div class="nav-right-group">
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#planner" class="nav-link" data-i18n="nav.plan">Plan Trip</a></li>
+            <li><a href="#recommendations" class="nav-link" data-i18n="nav.destinations">Destinations</a></li>
+            <li><a href="#results" class="nav-link" data-i18n="nav.itinerary">Itinerary</a></li>
+          </ul>
+        </nav>
+
+        <!-- Header Selectors: Language & Currency -->
+        <div class="header-controls">
+          <!-- Language Selector -->
+          <div class="control-box" title="Interface Language / Γλώσσα / Språk / Sprache / Idioma">
+            <span class="control-icon">🌐</span>
+            <select id="language-select" class="header-select" aria-label="Select Interface Language">
+              <option value="en" selected>English</option>
+              <option value="el">Ελληνικά</option>
+              <option value="sv">Svenska</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+
+          <!-- Currency Selector -->
+          <div class="control-box" title="Display Currency">
+            <span class="control-icon">💱</span>
+            <select id="currency-select" class="header-select" aria-label="Select Display Currency">
+              <option value="SEK" selected>SEK (kr)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="DKK">DKK (kr)</option>
+              <option value="NOK">NOK (kr)</option>
+            </select>
+          </div>
+
+          <!-- Exchange Rate Timestamp & Status Pill -->
+          <div id="exchange-rate-badge" class="exchange-rate-pill" title="Exchange rates sourced from European Central Bank (ECB)">
+            <span class="rate-dot"></span>
+            <span id="rate-status-text">ECB Rates</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       2. Hero Section
+       ====================================================================== -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-pill" data-i18n="hero.pill">✨ Powered by Google Gemini AI</div>
+      <h1 class="hero-title"><span data-i18n="hero.title">Smart Travel, Curated by AI, </span><span data-i18n="hero.titleAccent">Tailored to Your Budget</span></h1>
+      <p class="hero-subtitle" data-i18n="hero.subtitle">
+        Plan personalized day-by-day itineraries with realistic cost breakdowns. If your dream destination exceeds your budget, our smart AI finds similar, more affordable gems.
+      </p>
+      <div class="disclaimer-banner">
+        <span>ℹ️</span>
+        <span data-i18n="hero.disclaimer">Student Project Disclaimer: All travel costs are AI-generated planning estimates, not live booking prices.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       3. Trip Planner Form Section
+       ====================================================================== -->
+  <main>
+    <section id="planner" class="planner-section">
+      <div class="container">
+        <div class="planner-card">
+          <div class="form-header">
+            <h2 data-i18n="planner.title">🌍 Design Your Next Journey</h2>
+            <p data-i18n="planner.subtitle">Tell us where you want to go and your budget. If you're not sure where to go, click "Inspire Me"!</p>
+          </div>
+
+          <form id="travel-form">
+            <div class="form-grid">
+              <!-- Departure City -->
+              <div class="form-group">
+                <label for="departureCity" class="form-label" data-i18n="planner.departureLabel">🛫 Departure City</label>
+                <div class="input-wrapper">
+                  <input type="text" id="departureCity" list="city-suggestions" autocomplete="off" class="form-input" data-i18n-placeholder="planner.departurePlaceholder" placeholder="e.g. Stockholm" value="Stockholm" required>
+                </div>
+              </div>
+
+              <!-- Destination + Inspire Me -->
+              <div class="form-group">
+                <label for="destination" class="form-label" data-i18n="planner.destinationLabel">🛬 Destination City</label>
+                <div class="destination-input-group">
+                  <input type="text" id="destination" list="city-suggestions" autocomplete="off" class="form-input" data-i18n-placeholder="planner.destinationPlaceholder" placeholder="e.g. Rome (or click Inspire Me)" value="Rome">
+                  <button type="button" id="btn-inspire-me" class="btn-inspire" data-i18n="planner.inspireBtn" title="Ask AI for destination suggestions">
+                    💡 Inspire Me
+                  </button>
+                </div>
+              </div>
+
+              <!-- Number of Travelers -->
+              <div class="form-group">
+                <label for="travelers" class="form-label" data-i18n="planner.travelersLabel">👥 Travelers</label>
+                <div class="input-wrapper">
+                  <input type="number" id="travelers" class="form-input" min="1" max="20" value="2" required>
+                  <span class="input-suffix" data-i18n="planner.travelersSuffix">people</span>
+                </div>
+              </div>
+
+              <!-- Departure Date -->
+              <div class="form-group">
+                <label for="departureDate" class="form-label" data-i18n="planner.departureDateLabel">🛫 Departure Date</label>
+                <div class="input-wrapper">
+                  <input type="date" id="departureDate" class="form-input" required>
+                </div>
+              </div>
+
+              <!-- Return Date -->
+              <div class="form-group">
+                <label for="returnDate" class="form-label" data-i18n="planner.returnDateLabel">🛬 Return Date</label>
+                <div class="input-wrapper">
+                  <input type="date" id="returnDate" class="form-input" required>
+                </div>
+              </div>
+
+              <!-- Total Budget (with Dynamic Currency Suffix) -->
+              <div class="form-group">
+                <label for="budgetSEK" class="form-label" data-i18n="planner.budgetLabel">💰 Total Budget</label>
+                <div class="input-wrapper">
+                  <input type="number" id="budgetSEK" class="form-input" min="50" step="50" value="10000" required>
+                  <span id="budget-currency-suffix" class="input-suffix">SEK</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Duration Summary Pill & Accommodation Note -->
+            <div class="duration-indicator-row">
+              <div class="duration-badge">
+                <span>📅 </span>
+                <span id="calc-duration-text">4 travel days (3 hotel nights)</span>
+              </div>
+              <span class="nights-note" data-i18n="planner.nightsNote">
+                ℹ️ Lodging is calculated as (days − 1) nights. Requirements may vary based on arrival and departure flight times.
+              </span>
+            </div>
+
+            <!-- Flexible Budget Exclusions: Already Booked / Paid -->
+            <div class="exclusions-card">
+              <div class="exclusions-header">
+                <strong data-i18n="planner.exclusionsTitle">💳 Already Paid / Booked Expenses (Optional)</strong>
+                <span class="exclusions-subtitle" data-i18n="planner.exclusionsSubtitle">Exclude pre-paid costs from your remaining budget check:</span>
+              </div>
+              <div class="exclusions-grid">
+                <label class="exclusion-checkbox">
+                  <input type="checkbox" id="excludeTransport">
+                  <span data-i18n="planner.excludeFlightsLabel">✈️ Flights / Long-distance transport already paid</span>
+                </label>
+                <label class="exclusion-checkbox">
+                  <input type="checkbox" id="excludeAccommodation">
+                  <span data-i18n="planner.excludeHotelLabel">🏨 Accommodation already paid</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Travel Interests -->
+            <div class="interests-group">
+              <label class="form-label" data-i18n="planner.interestsLabel">🎨 Travel Interests & Style</label>
+              <div class="interests-tags">
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Culture & History" checked>
+                  <span class="tag-label" data-i18n="interest.culture">🏛️ Culture & History</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Food & Dining" checked>
+                  <span class="tag-label" data-i18n="interest.food">🍕 Food & Dining</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Nature & Outdoors">
+                  <span class="tag-label" data-i18n="interest.nature">🌲 Nature & Outdoors</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Budget & Backpacking">
+                  <span class="tag-label" data-i18n="interest.budget">🎒 Budget Friendly</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Adventure">
+                  <span class="tag-label" data-i18n="interest.adventure">🧗 Adventure</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Relaxation & Spa">
+                  <span class="tag-label" data-i18n="interest.relaxation">☕ Relaxation</span>
+                </label>
+                <label class="interest-tag">
+                  <input type="checkbox" name="interests" value="Art & Museums">
+                  <span class="tag-label" data-i18n="interest.art">🎨 Art & Museums</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit Button & Action Area -->
+            <div class="form-actions">
+              <button type="button" class="btn-primary" id="btn-generate-plan">
+                <span data-i18n="planner.submitBtn">✨ Generate Travel Plan</span>
+              </button>
+            </div>
+
+            <!-- Loading Status Indicator -->
+            <div id="ai-loading" class="ai-loading-card" style="display: none;">
+              <div class="spinner"></div>
+              <div class="loading-text-block">
+                <h4 id="loading-title" data-i18n="loading.title">Generating Your AI Travel Plan...</h4>
+                <p id="loading-sub" data-i18n="loading.sub">Consulting Google Gemini AI for realistic itinerary activities and baseline estimates.</p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         4. AI Destination Recommendations Section (Placeholder Demo)
+         ====================================================================== -->
+    <section id="recommendations" class="recommendations-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge" data-i18n="rec.badge">AI Recommendations</span>
+          <h2 class="section-title" data-i18n="rec.title">Need Ideas? Destinations Matching Your Budget</h2>
+          <p class="section-subtitle" data-i18n="rec.subtitle">Curated destinations matching your travel style and estimated target budget.</p>
+        </div>
+
+        <p data-i18n="demo.bannerText" style="margin:12px 0; font-weight:600; color:var(--teal-primary);">Sample preview, not live AI results.</p>
+        <div id="destinations-grid" class="destinations-grid">
+          <!-- Card 1: Riga -->
+          <article class="destination-card">
+            <div class="card-top">
+              <div class="card-location">
+                <h3 class="card-city">Riga, Latvia</h3>
+                <span class="card-vibe">Historic & Culinary</span>
+              </div>
+              <p class="card-desc">
+                Stunning Hanseatic Old Town, rich Art Nouveau architecture, and a buzzing cafe culture that easily fits within a modest budget.
+              </p>
+              <div class="card-highlights">
+                <h4 data-i18n="rec.highlights">Highlights</h4>
+                <div class="highlights-pills">
+                  <span class="highlight-pill">Old Town Vecriga</span>
+                  <span class="highlight-pill">Central Market</span>
+                  <span class="highlight-pill">Art Nouveau District</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="price-estimate">
+                <span class="price-label" data-i18n="rec.ballpark">Estimated Ballpark</span>
+                <span class="price-amount" data-sek="4500" data-is-estimate="true">~ 4,500 SEK</span>
+                <span class="price-tag-est" data-i18n="rec.estimateNote">Planning estimate for 2</span>
+              </div>
+              <button type="button" class="btn-select" data-i18n="rec.selectBtn">Select</button>
+            </div>
+          </article>
+
+          <!-- Card 2: Tallinn -->
+          <article class="destination-card">
+            <div class="card-top">
+              <div class="card-location">
+                <h3 class="card-city">Tallinn, Estonia</h3>
+                <span class="card-vibe">Medieval & Trendy</span>
+              </div>
+              <p class="card-desc">
+                A short flight or ferry from Sweden brings you to cobblestone streets, fairy-tale towers, and modern Nordic gastronomy.
+              </p>
+              <div class="card-highlights">
+                <h4 data-i18n="rec.highlights">Highlights</h4>
+                <div class="highlights-pills">
+                  <span class="highlight-pill">Toompea Hill</span>
+                  <span class="highlight-pill">Town Hall Square</span>
+                  <span class="highlight-pill">Kalamaja District</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="price-estimate">
+                <span class="price-label" data-i18n="rec.ballpark">Estimated Ballpark</span>
+                <span class="price-amount" data-sek="4800" data-is-estimate="true">~ 4,800 SEK</span>
+                <span class="price-tag-est" data-i18n="rec.estimateNote">Planning estimate for 2</span>
+              </div>
+              <button type="button" class="btn-select" data-i18n="rec.selectBtn">Select</button>
+            </div>
+          </article>
+
+          <!-- Card 3: Gdansk -->
+          <article class="destination-card">
+            <div class="card-top">
+              <div class="card-location">
+                <h3 class="card-city">Gdansk, Poland</h3>
+                <span class="card-vibe">Maritime & History</span>
+              </div>
+              <p class="card-desc">
+                Picturesque canals, amber workshops, amber-lit streets, and world-class pierogi restaurants at exceptionally budget-friendly prices.
+              </p>
+              <div class="card-highlights">
+                <h4 data-i18n="rec.highlights">Highlights</h4>
+                <div class="highlights-pills">
+                  <span class="highlight-pill">Long Market</span>
+                  <span class="highlight-pill">WWII Museum</span>
+                  <span class="highlight-pill">Motława Waterfront</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="price-estimate">
+                <span class="price-label" data-i18n="rec.ballpark">Estimated Ballpark</span>
+                <span class="price-amount" data-sek="4200" data-is-estimate="true">~ 4,200 SEK</span>
+                <span class="price-tag-est" data-i18n="rec.estimateNote">Planning estimate for 2</span>
+              </div>
+              <button type="button" class="btn-select" data-i18n="rec.selectBtn">Select</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         5. Results Dashboard: Itinerary & Budget Health (Preview Demo)
+         ====================================================================== -->
+    <section id="results" class="results-section">
+      <div class="container">
+        <p id="sample-results-note" data-i18n="demo.badge" style="font-weight:700; margin:12px 0;">SAMPLE DEMO PREVIEW</p>
+        <div id="results-content">
+        
+        <!-- Trip Overview Banner -->
+        <div class="trip-overview-banner">
+          <div class="overview-content">
+            <h2>Rome, Italy Itinerary</h2>
+            <p>
+              An unforgettable 4-day journey exploring ancient wonders, Vatican treasures, authentic Trastevere trattorias, and vibrant piazzas.
+            </p>
+            <div class="overview-meta">
+              <span class="meta-pill">📅 4 Days</span>
+              <span class="meta-pill">👥 2 Travelers</span>
+              <span class="meta-pill">🛫 From Stockholm</span>
+              <span class="meta-pill">🍂 Best Time: April – June & Sept – Oct</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             SPECIAL FEATURE: Budget Health & Insufficient Budget Detection
+             ================================================================== -->
+        <div class="budget-health-card">
+          <div class="budget-header">
+            <h3 data-i18n="budget.healthTitle">📊 Budget Health & Estimated Cost Analysis</h3>
+            <span class="currency-badge" data-i18n="budget.jsBadge">Calculated via Deterministic JavaScript</span>
+          </div>
+
+          <!-- Active Budget Warning Alert Box (Demonstrates Special Feature) -->
+          <div class="budget-alert-box">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-body">
+              <h4 data-i18n="budget.alertTitleExceeded">Estimated Trip Cost Exceeds Your Budget!</h4>
+              <p>
+                Your target budget is <strong id="alert-user-budget" data-sek="10000">10,000 kr</strong>, but the estimated total cost for this 4-day trip to Rome is <strong id="alert-est-total" data-sek="12800" data-is-estimate="true">~ 12,800 kr (est.)</strong>. 
+                You are currently short by <strong id="alert-shortfall" data-sek="2800">2,800 kr</strong>.
+              </p>
+              <div class="alert-actions">
+                <a href="#affordable-alternatives" class="btn-outline-danger" data-i18n="budget.alertViewAlt">View More Affordable Destinations Below ↓</a>
+                <a href="#planner" class="btn-outline-danger" data-i18n="budget.alertAdjust">Adjust Trip Parameters ↑</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Comparison Meter -->
+          <div class="budget-meter-container">
+            <div class="meter-labels">
+              <span><span data-i18n="budget.userBudgetLabel">Your Budget:</span> <strong data-sek="10000">10,000 kr</strong></span>
+              <span style="color: var(--status-warning-badge);"><span data-i18n="budget.estimatedTotalLabel">Estimated Total:</span> <strong data-sek="12800" data-is-estimate="true">~ 12,800 kr (est.)</strong> (+28% over)</span>
+            </div>
+            <div class="meter-track">
+              <!-- Meter Fill styled with warning gradient -->
+              <div class="meter-fill exceeded" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown Grid -->
+          <div class="breakdown-grid">
+            <div class="breakdown-item">
+              <div class="cat-icon">✈️</div>
+              <div class="cat-name" data-i18n="cat.transport">Transport</div>
+              <div class="cat-amount" data-sek="3800" data-is-estimate="true">~ 3,800 kr (est.)</div>
+              <div class="cat-tag" data-i18n="cat.transportSub">Flights & Transit (est.)</div>
+            </div>
+
+            <div class="breakdown-item">
+              <div class="cat-icon">🏨</div>
+              <div class="cat-name" data-i18n="cat.lodging">Lodging</div>
+              <div class="cat-amount" data-sek="4600" data-is-estimate="true">~ 4,600 kr (est.)</div>
+              <div class="cat-tag" data-i18n="cat.lodgingSub">Hotel / Stay (est.)</div>
+            </div>
+
+            <div class="breakdown-item">
+              <div class="cat-icon">🍽️</div>
+              <div class="cat-name" data-i18n="cat.food">Food & Dining</div>
+              <div class="cat-amount" data-sek="2200" data-is-estimate="true">~ 2,200 kr (est.)</div>
+              <div class="cat-tag" data-i18n="cat.foodSub">Meals & Dining (est.)</div>
+            </div>
+
+            <div class="breakdown-item">
+              <div class="cat-icon">🎟️</div>
+              <div class="cat-name" data-i18n="cat.activities">Activities</div>
+              <div class="cat-amount" data-sek="1040" data-is-estimate="true">~ 1,040 kr (est.)</div>
+              <div class="cat-tag" data-i18n="cat.activitiesSub">Tickets & Sights (est.)</div>
+            </div>
+
+            <div class="breakdown-item">
+              <div class="cat-icon">🛡️</div>
+              <div class="cat-name" data-i18n="cat.buffer">10% Safety Buffer</div>
+              <div class="cat-amount" data-sek="1160" data-is-estimate="true">~ 1,160 kr (est.)</div>
+              <div class="cat-tag" data-i18n="cat.bufferSub">Emergency Reserve (est.)</div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               SPECIAL FEATURE: More Affordable Similar Destinations Box
+               ============================================================== -->
+          <div id="affordable-alternatives" class="affordable-alternatives-container">
+            <div class="alternatives-header">
+              <span style="font-size: 1.5rem;">💡</span>
+              <div>
+                <h4 data-i18n="alt.boxTitle">Special Feature: Similar Destinations That Fit Your Budget</h4>
+                <p data-i18n="alt.boxSubtitle" style="font-size: 0.9rem; color: var(--text-muted);">
+                  Love the vibe of this destination? These similar spots offer a comparable experience at significantly lower costs:
+                </p>
+              </div>
+            </div>
+
+            <div class="alternatives-grid">
+              <!-- Alternative 1: Budapest -->
+              <div class="alt-card">
+                <div>
+                  <h5 class="alt-title">Budapest, Hungary</h5>
+                  <p class="alt-match">Grand architecture, historic thermal baths, and riverside castles like Rome.</p>
+                  <span class="alt-savings-badge">
+                    <span data-i18n="alt.savesPrefix">💰 Saves approx.</span> <span data-sek="3600">3,600 kr</span>
+                  </span>
+                </div>
+                <div>
+                  <p class="alt-cost">Est. Total: <span data-sek="9200" data-is-estimate="true">~ 9,200 kr (est.)</span></p>
+                  <button type="button" class="btn-select" data-i18n="alt.switchBtn" style="width: 100%; margin-top: 8px;">Switch to this City</button>
+                </div>
+              </div>
+
+              <!-- Alternative 2: Krakow -->
+              <div class="alt-card">
+                <div>
+                  <h5 class="alt-title">Krakow, Poland</h5>
+                  <p class="alt-match">Incredible UNESCO medieval old town, castles, and rich cultural heritage.</p>
+                  <span class="alt-savings-badge">
+                    <span data-i18n="alt.savesPrefix">💰 Saves approx.</span> <span data-sek="4300">4,300 kr</span>
+                  </span>
+                </div>
+                <div>
+                  <p class="alt-cost">Est. Total: <span data-sek="8500" data-is-estimate="true">~ 8,500 kr (est.)</span></p>
+                  <button type="button" class="btn-select" data-i18n="alt.switchBtn" style="width: 100%; margin-top: 8px;">Switch to this City</button>
+                </div>
+              </div>
+
+              <!-- Alternative 3: Vilnius -->
+              <div class="alt-card">
+                <div>
+                  <h5 class="alt-title">Vilnius, Lithuania</h5>
+                  <p class="alt-match">Charming baroque churches, cobblestone streets, and cozy dining.</p>
+                  <span class="alt-savings-badge">
+                    <span data-i18n="alt.savesPrefix">💰 Saves approx.</span> <span data-sek="4900">4,900 kr</span>
+                  </span>
+                </div>
+                <div>
+                  <p class="alt-cost">Est. Total: <span data-sek="7900" data-is-estimate="true">~ 7,900 kr (est.)</span></p>
+                  <button type="button" class="btn-select" data-i18n="alt.switchBtn" style="width: 100%; margin-top: 8px;">Switch to this City</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             6. Day-by-Day Itinerary Section
+             ================================================================== -->
+        <div class="itinerary-section">
+          <h3 data-i18n="itin.scheduleTitle">🗓️ Day-by-Day Travel Schedule</h3>
+
+          <div class="days-container">
+            <!-- Day 1 -->
+            <article class="day-card">
+              <div class="day-header">
+                <span class="day-number-badge"><span data-i18n="itin.day">Day</span> 1</span>
+                <h4 class="day-title">Ancient Heart of Rome & Piazzas</h4>
+              </div>
+              <div class="timeline-slots">
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.morning">🌅 Morning</div>
+                  <div class="slot-activity">Colosseum & Roman Forum Walk</div>
+                  <div class="slot-desc">Marvel at the iconic amphitheater and stroll through the ancient political heart of Rome.</div>
+                  <span class="slot-est-cost" data-sek="320" data-is-estimate="true">~ 320 kr (est.)</span>
+                </div>
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.afternoon">☀️ Afternoon</div>
+                  <div class="slot-activity">Pantheon & Piazza Navona</div>
+                  <div class="slot-desc">Visit the architectural marvel of the Pantheon dome, followed by gelato near Bernini's fountain.</div>
+                  <span class="slot-est-cost" data-sek="60" data-is-estimate="true">~ 60 kr (est.)</span>
+                </div>
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.evening">🌙 Evening</div>
+                  <div class="slot-activity">Trevi Fountain & Trastevere Dining</div>
+                  <div class="slot-desc">Toss a coin into the Trevi Fountain, then cross the Tiber River for authentic Roman pasta.</div>
+                  <span class="slot-est-cost" data-sek="280" data-is-estimate="true">~ 280 kr (est.)</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Day 2 -->
+            <article class="day-card">
+              <div class="day-header">
+                <span class="day-number-badge"><span data-i18n="itin.day">Day</span> 2</span>
+                <h4 class="day-title">Vatican City & St. Peter's Splendor</h4>
+              </div>
+              <div class="timeline-slots">
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.morning">🌅 Morning</div>
+                  <div class="slot-activity">Vatican Museums & Sistine Chapel</div>
+                  <div class="slot-desc">Admire Michelangelo's legendary ceiling frescoes and the classical gallery collections.</div>
+                  <span class="slot-est-cost" data-sek="350" data-is-estimate="true">~ 350 kr (est.)</span>
+                </div>
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.afternoon">☀️ Afternoon</div>
+                  <div class="slot-activity">St. Peter's Basilica & Dome Climb</div>
+                  <div class="slot-desc">Explore the world's largest church and enjoy a panoramic view over Rome's rooftops.</div>
+                  <span class="slot-est-cost" data-sek="120" data-is-estimate="true">~ 120 kr (est.)</span>
+                </div>
+                <div class="slot">
+                  <div class="slot-label" data-i18n="itin.evening">🌙 Evening</div>
+                  <div class="slot-activity">Castel Sant'Angelo Sunset</div>
+                  <div class="slot-desc">Golden hour stroll along the Tiber riverbanks and casual dinner in the Prati neighborhood.</div>
+                  <span class="slot-est-cost" data-sek="240" data-is-estimate="true">~ 240 kr (est.)</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             7. Trip Action Buttons (Adjust, Save, Export)
+             ================================================================== -->
+        <div class="trip-actions-bar">
+          <a href="#planner" class="btn-secondary" data-i18n="action.adjust">🔄 Adjust Trip Parameters</a>
+          <button type="button" class="btn-save" id="btn-save-plan" data-i18n="action.save">💾 Save Trip to Browser</button>
+          <button type="button" class="btn-secondary" onclick="window.print()" data-i18n="action.print">🖨️ Print / Export Itinerary</button>
+        </div>
+
+        </div><!-- end #results-content -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================================
+       8. Footer
+       ====================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="brand-logo" style="justify-content: center;">
+        <span class="brand-icon">✈️</span>
+        <span data-i18n="brand.name">Travora</span>
+      </div>
+      <p class="footer-text" data-i18n="footer.schoolNote">
+        Created for an IT School Project • Built with Node.js, Express, and Google Gemini AI
+      </p>
+      <p class="footer-disclaimer" data-i18n="footer.disclaimer">
+        ℹ️ Planning Disclaimer: All pricing estimates are generated for travel planning and budgetary comparisons only. Actual transportation, lodging, and seasonal flight rates are subject to real-time market fluctuations.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Frontend Scripts -->
+  <!-- Free, offline autocomplete for frequently searched cities. Other cities can still be typed. -->
+  <datalist id="city-suggestions"></datalist>
+  <script src="js/translations.js"></script>
+  <script src="js/currency.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
